@@ -111,7 +111,8 @@ def HASM(nom_fichier):
     nombre_uniques = nombre_de_couples_uniques(matrice)
     
     if(nombre_uniques!=len(matrice)):
-        return "Il y a au moins une répétition d'un point de coordonnée dans la base de donnée"
+        print("Attention : Il y a au moins une répétition d'un point de coordonnée dans la base de donnée")
+        return
     else:
         
         
