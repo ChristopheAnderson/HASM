@@ -57,7 +57,7 @@ def nombre_de_couples_uniques(matrice):
 
 
 
-def HASM(nom_fichier,interval_x,interval_y,fichier_fonction, lambd=1):
+def HASM(nom_fichier,interval_x,interval_y,fichier_fonction,forma, lambd=100):
 
     # Charger le fichier Excel sans en-têtes
     df = pd.read_excel(nom_fichier, header=None)
@@ -110,9 +110,6 @@ def HASM(nom_fichier,interval_x,interval_y,fichier_fonction, lambd=1):
         
         h=h1
         
-        # Charger le fichier Excel sans en-têtes
-        Z = pd.read_excel(fichier_fonction, header=None)
-        Z=np.array(Z)
         
         
         def coro(i,j):
@@ -358,6 +355,12 @@ def HASM(nom_fichier,interval_x,interval_y,fichier_fonction, lambd=1):
         
         # Métrique de performance
             #RMSE
+        
+        
+        # Charger le fichier Excel sans en-têtes
+        Z = pd.read_excel(fichier_fonction, header=None)
+        Z=np.array(Z)
+        
         moyenne=np.mean(np.array(Z[1:I1+1,1:J1+1]))
         dénominateur=0
         RMSE=0
@@ -393,6 +396,9 @@ def HASM(nom_fichier,interval_x,interval_y,fichier_fonction, lambd=1):
         Y = Y[:, 1:J-1]
         
         
+        
+
+        
         # Affichage en 2D avec un nuage de points
         fig=plt.figure(figsize=(8, 6))
         #plt.scatter(X, Y, c=Solu, cmap='viridis')
@@ -414,11 +420,63 @@ def HASM(nom_fichier,interval_x,interval_y,fichier_fonction, lambd=1):
         
         #print("Matrice après insertion :\n", result_matrix)
         
-        return Solu
+        if(forma==1):
+            # donnée initiale à l'intérieur domaine
+            donnee_initiale=Z[1:I1+1,1:J1+1]
+            return (X,Y,Solu,donnee_initiale)
+        if(forma==2):
+            # donnée initiale à l'intérieur domaine et non au bord du domaine
+            donnee_initiale=Z[1:I1+1,1:J1+1]
+            X = np.reshape(X, ( I1*J1 , 1 )) # redimensionnement de la taille
+            Y = np.reshape(Y, ( I1*J1 , 1 )) # redimensionnement de la taille
+            Solu = np.reshape(Solu, ( I1*J1 , 1 )) # redimensionnement de la taille
+            donnee_initiale = np.reshape(donnee_initiale, ( I1*J1 , 1 )) # redimensionnement de la taille
+            
+            return (X,Y,Solu,donnee_initiale)
+        else:
+            return "Attention : Le cinquième paramètre qui est le format ne prend que deux valeurs \n Le format 1 renvoie le résultat de la prédiction sous forme de matrice \n le format 2 renvoie le résultat de la prédiction sous forme de vecteur"
 
 
 nom_fichier='matrice.xlsx'
 fichier_fonction='fonction.xlsx'
 x_range = (0, 0.49)
 y_range = (0, 0.59)
-solu= HASM(nom_fichier,x_range,y_range,fichier_fonction,100)
+forma=2
+# Le résultat de la prédiction de la méthode HASM renvoie sous le format indiqué dans l'ordre :
+# 1- les valeurs des abscisses dicrétisés 
+# 2- les valeurs des ordonnées dicrétisés 
+# 3- les valeurs de prédiction de l'attributs aux points de coordonées 
+#    dicrétisées ci-dessus
+# 4- les valeurs des données exactes fournies de l'attibuts à l'intérieur du 
+#    du domaine et non au bord du domaine
+sortie_prediction= HASM(nom_fichier,x_range,y_range,fichier_fonction,forma,1000)
+X,Y,Solu,donnee_initiale=sortie_prediction
+# Convertir la matrice en DataFrame
+
+if (forma==1):
+    mon_fichier1= pd.DataFrame(X)
+    mon_fichier2= pd.DataFrame(Y)
+    mon_fichier3= pd.DataFrame(Solu)
+    mon_fichier4= pd.DataFrame(donnee_initiale)
+    #Enregistrer la DataFrame dans un fichier Excel
+    mon_fichier1.to_excel("Sortie_prediction_format1/X1.xlsx", index=False, header=False)
+    mon_fichier2.to_excel("Sortie_prediction_format1/Y1.xlsx", index=False, header=False)
+    mon_fichier3.to_excel("Sortie_prediction_format1/prédiction1.xlsx", index=False, header=False)
+    mon_fichier4.to_excel("Sortie_prediction_format1/Z_donnée1.xlsx", index=False, header=False)
+    
+    
+ 
+if (forma==2):
+    
+    # Combiner les matrices en une seule matrice à plusieurs colonnes
+    combined_matrix = np.column_stack((X, Y, Solu, donnee_initiale))
+    
+    # Transformer la matrice en DataFrame pandas
+    mon_fichier= pd.DataFrame(combined_matrix, columns=['X1', 'Y1', 'prediction1','Z_donnee1'])
+    
+    # Spécifier le chemin complet où le fichier Excel sera enregistré
+    chemin_fichier = 'Sortie_prediction_format2/Sortie_format1_prediction1.xlsx'
+    
+    # Enregistrer le DataFrame dans un fichier Excel
+    mon_fichier.to_excel(chemin_fichier, index=False)
+
