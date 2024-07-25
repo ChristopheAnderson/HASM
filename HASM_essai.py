@@ -41,32 +41,6 @@ def tri_diagonal_matrix(n):
 
 
 
-def discretize_2d_function(func, x_range, y_range, num_points_x, num_points_y):
-    # Discrétisation des domaines x et y
-    x_vals = np.linspace(x_range[0], x_range[1], num_points_x)
-    y_vals = np.linspace(y_range[0], y_range[1], num_points_y)
-    
-    # Création d'une grille de points 2D
-    Y, X = np.meshgrid(y_vals, x_vals)
-    
-    # Calcul des valeurs de la fonction en chaque point
-    Z = func(X, Y)
-    
-    # Création du dictionnaire pour stocker les valeurs de la fonction avec leur numérotation horizontale
-    points_dict = {}
-    for i, x in enumerate(x_vals):
-        for j, y in enumerate(y_vals):
-            point_num = i * num_points_y + j
-            points_dict[point_num] = {'x': x, 'y': y, 'value': Z[i, j]}
-    
-    return X, Y, Z, points_dict
-
-# Fonction exemple
-def example_function(x, y):
-    return x**2 - y**2
-
-
-
 
 def nombre_de_couples_uniques(matrice):
     # Utiliser un ensemble pour stocker les couples uniques
@@ -83,7 +57,7 @@ def nombre_de_couples_uniques(matrice):
 
 
 
-def HASM(nom_fichier):
+def HASM(nom_fichier,interval_x,interval_y,fichier_fonction, lambd=1):
 
     # Charger le fichier Excel sans en-têtes
     df = pd.read_excel(nom_fichier, header=None)
@@ -99,7 +73,7 @@ def HASM(nom_fichier):
     I,J=max(colonne0),max(colonne1)
     I1,J1=(I-2),(J-2)
     n=I1*J1
-    lambd=1 # prenom la valeur de lambda=1
+    # lambd=1    valeur de lambda par défaut 
     
     colonne0= colonne0-1
     colonne1= colonne1-1
@@ -120,23 +94,25 @@ def HASM(nom_fichier):
         
         # Paramètres de discrétisation
         
-        x_range = (0, 1)
-        y_range = (0, 1)
+        x_range = interval_x
+        y_range = interval_y
         num_points_x = I
         num_points_y = J
         
         x_vals = np.linspace(x_range[0], x_range[1], num_points_x)
-        h=x_vals[1]-x_vals[0]
+        y_vals = np.linspace(y_range[0], y_range[1], num_points_y)
+        h1=x_vals[1]-x_vals[0]
+        h2=y_vals[1]-y_vals[0]
         
-        # Discrétisation et récupération des valeurs de la fonction
-        X, Y, Z, points_dict = discretize_2d_function(example_function, x_range, y_range, num_points_x, num_points_y)
+        if(h1!=h2):
+            print("Les pas pour les deux axes ne sont pas égaux")
+            return
         
-        # Affichage des résultats
-        #print("Valeurs de la fonction en chaque point de la grille:")
-        #print(Z)
-        #print("\nDictionnaire des points de discrétisation avec leurs valeurs:")
-        #for point_num, info in points_dict.items():
-            #print(f"Point {point_num}: (x={info['x']}, y={info['y']}, value={info['value']})")
+        h=h1
+        
+        # Charger le fichier Excel sans en-têtes
+        Z = pd.read_excel(fichier_fonction, header=None)
+        Z=np.array(Z)
         
         
         def coro(i,j):
@@ -404,6 +380,10 @@ def HASM(nom_fichier):
         print("RMSE relative au points échantillonné      RMSE=  ", RMSE_rela ,"    R=  ",R)
         
         
+        x = np.linspace(x_range[0], x_range[1], I)
+        y = np.linspace(y_range[0], y_range[1], J)
+        Y, X = np.meshgrid(y, x)
+        
         # Supprimer la première et la derniere ligne
         X = X[1:I-1]
         Y = Y[1:I-1]
@@ -422,7 +402,9 @@ def HASM(nom_fichier):
         ax = fig.add_subplot(111, projection='3d')
         ax.plot_surface(X, Y, Solu, cmap='viridis')
         ax.set_title('Représentation 3D de la fonction')
-        plt.title('Représentation 2D de la fonction avec un nuage de points')
+        plt.title('Surface plot of f(x, y) =')
+        #Représentation 2D de la fonction avec un nuage de points
+        ax.set_zlim(np.min(Z)+1, np.max(Z)+1)
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.grid(True)
@@ -436,4 +418,7 @@ def HASM(nom_fichier):
 
 
 nom_fichier='matrice.xlsx'
-solu=HASM(nom_fichier)
+fichier_fonction='fonction.xlsx'
+x_range = (0, 0.49)
+y_range = (0, 0.59)
+solu= HASM(nom_fichier,x_range,y_range,fichier_fonction,100)

@@ -7,12 +7,24 @@ import pandas as pd
 
 # Définir la fonction
 def f(x, y):
-    return x**2 - y**2
-I=50
-J=50
+    return np.cos(10*y) + np.sin(10*(x-y))
+
+#points initiaux
+a,b=0,0
+# nombre de points sur les deux axes
+I,J=50,60
+# pas commun des deux axes
+h=0.01
 # Créer des données pour les axes x et y
-x = np.linspace(0, 1, I)
-y = np.linspace(0, 1, J)
+x=[ a + i*h for i in range (I) ]
+y=[ b + j*h for j in range (J) ]
+
+x_range=(a , x[I-1])
+y_range=(b , y[J-1])
+# pgcd = math.gcd(I, J)
+# pgcd = pgcd/100
+# ppcm=(I*J)/pgcd
+
 Y, X = np.meshgrid(y, x)
 
 # Calculer les valeurs de z
@@ -21,7 +33,7 @@ Z = f(X, Y)
 # y_num=np.linspace(1, J, J)
 
 np.random.seed(42)
-point_number=2*I+2*(J-2)+46*46
+point_number=2*I+2*(J-2)+46*56
 inner_point=point_number-2*I-2*(J-2)
 
 
@@ -50,7 +62,7 @@ def choix(N):
     
     return(x_val,y_val)
 
-x_val , y_val = choix(2)
+x_val , y_val = choix(1)
 
 z_val=np.empty(point_number)
 incre=0
@@ -88,6 +100,10 @@ matrice=matrice.T
 fichier_excel = pd.DataFrame(matrice)
 # Enregistrer la DataFrame dans un fichier Excel
 fichier_excel.to_excel("matrice.xlsx", index=False, header=False)
+# Pareil pour les vecteurs de la fonction
+fichier_fonction = pd.DataFrame(Z)
+# Enregistrer la DataFrame dans un fichier Excel
+fichier_fonction.to_excel("fonction.xlsx", index=False, header=False)
 
 
 # Créer une figure et un axe 3D
@@ -97,13 +113,17 @@ ax = fig.add_subplot(111, projection='3d')
 # Tracer la surface
 ax.plot_surface(X, Y, Z, cmap='viridis')
 
+ax.set_zlim(np.min(Z)+1, np.max(Z)+1)
+
+
 # Ajouter des étiquettes aux axes
 ax.set_xlabel('X axis')
 ax.set_ylabel('Y axis')
 ax.set_zlabel('Z axis')
 
 # Titre
-ax.set_title('Surface plot of f(x, y) = 1/3*np.exp(-(81/4)*((x-0.5)**2+(y-0.5)**2')
+ax.set_title('Surface plot of f(x, y) =')
+# 1/3*np.exp(-(81/4)*((x-0.5)**2+(y-0.5)**2
 
 # Afficher le graphique
 plt.show()
