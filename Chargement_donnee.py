@@ -7,10 +7,10 @@ import pandas as pd
 
 # Définir la fonction
 def f(x, y):
-    return np.cos(10*y) + np.sin(10*(x-y))
+    return x*y 
 
 #points initiaux
-a,b=0,0
+a,b=5,0
 # nombre de points sur les deux axes
 I,J=50,60
 # pas commun des deux axes
@@ -33,7 +33,7 @@ Z = f(X, Y)
 # y_num=np.linspace(1, J, J)
 
 np.random.seed(42)
-point_number=2*I+2*(J-2)+46*56
+point_number=2*I+2*(J-2)+int(70*(I-2)*(J-2)/100)
 inner_point=point_number-2*I-2*(J-2)
 
 
@@ -113,7 +113,7 @@ ax = fig.add_subplot(111, projection='3d')
 # Tracer la surface
 ax.plot_surface(X, Y, Z, cmap='viridis')
 
-ax.set_zlim(np.min(Z)+1, np.max(Z)+1)
+ax.set_zlim(np.min(Z), np.max(Z))
 
 
 # Ajouter des étiquettes aux axes

@@ -104,7 +104,9 @@ def HASM(nom_fichier,interval_x,interval_y,fichier_fonction,forma, lambd=100):
         h1=x_vals[1]-x_vals[0]
         h2=y_vals[1]-y_vals[0]
         
-        if(h1!=h2):
+        epsilon = 1e-10
+        
+        if np.abs((h1-h2)) > epsilon:
             print("Les pas pour les deux axes ne sont pas égaux")
             return
         
@@ -410,7 +412,7 @@ def HASM(nom_fichier,interval_x,interval_y,fichier_fonction,forma, lambd=100):
         ax.set_title('Représentation 3D de la fonction')
         plt.title('Surface plot of f(x, y) =')
         #Représentation 2D de la fonction avec un nuage de points
-        ax.set_zlim(np.min(Z)+1, np.max(Z)+1)
+        ax.set_zlim(np.min(Z), np.max(Z))
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.grid(True)
@@ -439,7 +441,7 @@ def HASM(nom_fichier,interval_x,interval_y,fichier_fonction,forma, lambd=100):
 
 nom_fichier='matrice.xlsx'
 fichier_fonction='fonction.xlsx'
-x_range = (0, 0.49)
+x_range = (5, 5.49)
 y_range = (0, 0.59)
 forma=2
 # Le résultat de la prédiction de la méthode HASM renvoie sous le format indiqué dans l'ordre :

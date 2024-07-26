@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math
 import random
+import pandas as pd
+
 
 
 I,J=50,50
@@ -46,7 +48,7 @@ def discretize_2d_function(func, x_range, y_range, num_points_x, num_points_y):
     y_vals = np.linspace(y_range[0], y_range[1], num_points_y)
     
     # Création d'une grille de points 2D
-    X, Y = np.meshgrid(x_vals, y_vals)
+    Y, X = np.meshgrid(y_vals, x_vals)
     
     # Calcul des valeurs de la fonction en chaque point
     Z = func(X, Y)
@@ -62,7 +64,7 @@ def discretize_2d_function(func, x_range, y_range, num_points_x, num_points_y):
 
 # Fonction exemple
 def example_function(x, y):
-    return 1/3*np.exp(-(81/4)*((x-0.5)**2+(y-0.5)**2) )
+    return np.cos(10*y) + np.sin(10*(x-y))
 
 # Paramètres de discrétisation
 
@@ -101,8 +103,8 @@ fo = np.zeros((I*J,1))
 # Valeurs de la fonction au J+1 sampling point 
 
 fonc_init = np.zeros((n,1))
-x= random.sample(range(0,I-2),2)
-y= random.sample(range(0,J-2),2)
+x= random.sample(range(0,I-2),I1)
+y= random.sample(range(0,J-2),J1)
 for i in x:
     for j in y:
         fonc_init[i*(J-2)+j,0]=coro(i+1, j+1)
@@ -221,7 +223,7 @@ for i in range(1,I-1):
         
     
         G111[i,j] = (  G[i,j]*(E[i+1,j]-E[i-1,j]) -2*F[i,j]*(F[i+1,j]-F[i-1,j]) + F[i,j]*(E[i,j+1]-E[i,j-1])  ) /( 4*h*(E[i,j]*G[i,j]-F[i,j]**2  ) )
-        G211[i,j] = (  2*E[i,j]*(F[i+1,j]-F[i-1,j]) -E[i,j]*(E[i,j+1]-E[i,j-1]) - F[i,j]*(F[i+1,j]-F[i-1,j])  ) /( 4*h*(E[i,j]*G[i,j]-F[i,j]**2  ) )
+        G211[i,j] = (  2*E[i,j]*(F[i+1,j]-F[i-1,j]) -E[i,j]*(E[i,j+1]-E[i,j-1]) - F[i,j]*(E[i+1,j]-E[i-1,j])  ) /( 4*h*(E[i,j]*G[i,j]-F[i,j]**2  ) )
         G122[i,j] = (  2*G[i,j]*(F[i,j+1]-F[i,j-1]) -G[i,j]*(G[i+1,j]-G[i-1,j]) - F[i,j]*(G[i,j+1]-G[i,j-1])  ) /( 4*h*(E[i,j]*G[i,j]-F[i,j]**2  ) )
         G222[i,j] = (  E[i,j]*(G[i,j+1]-G[i,j-1]) -2*F[i,j]*(F[i,j+1]-F[i,j-1]) + F[i,j]*(G[i+1,j]-G[i-1,j])  ) /( 4*h*(E[i,j]*G[i,j]-F[i,j]**2  ) )
         G112[i,j] = (  G[i,j]*(E[i,j+1]-E[i,j-1])  - F[i,j]*(G[i+1,j]-G[i-1,j])  ) /( 4*h*(E[i,j]*G[i,j]-F[i,j]**2  ) )
@@ -307,24 +309,26 @@ M = M[:, 1:J-1]
 # Résolution du problème
 
 # Méthode directe
+Z_solu=fonc_init
+nbr_ite=1
+for i in range(nbr_ite):
+    inverse_prod = np.linalg.inv( np.dot(main_matrix.T, main_matrix) + np.dot(matrix_B.T, matrix_B) + lambd**2*np.dot(Sampling.T, Sampling) )
+    second_prod = ( np.dot(main_matrix.T, D ) + np.dot(matrix_B.T, Q ) + lambd**2*np.dot(Sampling.T, Z_solu ) )
+    Z_solu = np.dot( inverse_prod , second_prod )
 
-inverse_prod = np.linalg.inv( np.dot(main_matrix.T, main_matrix) + np.dot(matrix_B.T, matrix_B) + lambd**2*np.dot(Sampling.T, Sampling) )
-second_prod = ( np.dot(main_matrix.T, D ) + np.dot(matrix_B.T, Q ) + lambd**2*np.dot(Sampling.T, fonc_init ) )
-
-Z_solu = np.dot( inverse_prod , second_prod )
 Solu = np.reshape(Z_solu, ( I1 , J1 )) # redimensionnement de la taille
 
 
 #Méthode itérative
 
-first = np.dot(main_matrix.T, main_matrix) + np.dot(matrix_B.T, matrix_B) + lambd**2*np.dot(Sampling.T, Sampling)
-diagonale = np.diag(np.diag(first))
-supérieure = -(np.triu(first)- np.diag(np.diag(first)))
-inférieure = -(np.tril(first) - np.diag(np.diag(first)))
+# first = np.dot(main_matrix.T, main_matrix) + np.dot(matrix_B.T, matrix_B) + lambd**2*np.dot(Sampling.T, Sampling)
+# diagonale = np.diag(np.diag(first))
+# supérieure = -(np.triu(first)- np.diag(np.diag(first)))
+# inférieure = -(np.tril(first) - np.diag(np.diag(first)))
 
-for i in range(8):
-    Z_final =  np.dot(np.dot( np.linalg.inv(diagonale-inférieure) , supérieure ), fonc_init)  +  np.dot( np.linalg.inv(diagonale-inférieure) , second_prod )
-    fonc_init=Z_final
+# for i in range(8):
+#     Z_final =  np.dot(np.dot( np.linalg.inv(diagonale-inférieure) , supérieure ), fonc_init)  +  np.dot( np.linalg.inv(diagonale-inférieure) , second_prod )
+#     fonc_init=Z_final
 
 # Métrique de performance
     #RMSE
@@ -342,8 +346,8 @@ RMSE_rela=0
 for i in x:
     for j in y:
         RMSE_rela=RMSE_rela+(Z[i+1, j+1]-Solu[i,j])**2
-RMSE_rela=math.sqrt(RMSE_rela/(I1*J1))
-print("RMSE_rela= ", RMSE_rela)
+RMSE_rela=math.sqrt(RMSE_rela/(len(x)*len(y)))
+print("RMSE relative au points échantillonné      RMSE= ", RMSE_rela)
 
 # Supprimer la première et la derniere ligne
 X = X[1:I-1]
