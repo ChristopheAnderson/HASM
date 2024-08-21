@@ -86,7 +86,7 @@ def arrondi_number(nombre):
 
 
 
-def HASM(nom_fichier,forma, lambd=1000):
+def HASM(nom_fichier , forma , pourcentage , position_attribut , lambd=1000):
 
 
     # Charger le fichier Excel sans en-têtes
@@ -95,14 +95,14 @@ def HASM(nom_fichier,forma, lambd=1000):
     #print(donnee[2])
     nombre_donnee=donnee.shape[0]
     #donnee entiere
-    maille=donnee.loc[:,0:2]
+    maille = donnee.loc[:, [0,1,position_attribut]]
     
-    df=donnee.loc[0:math.ceil(70*nombre_donnee/100),:]
+    df=donnee.loc[0:math.ceil(pourcentage*nombre_donnee/100),:]
    
     # Accéder à chaque colonne par son indice
     colonne0 = (df[0]).values
     colonne1 = (df[1]).values
-    colonne2 = (df[2]).values
+    colonne2 = (df[position_attribut]).values
     # Convertir le vecteur en entiers
     
     
@@ -459,7 +459,7 @@ def HASM(nom_fichier,forma, lambd=1000):
         # Z=np.reshape(donnee[2], ( I , J ))
         # Z=np.array(Z)
         
-        moyenne=np.mean(np.array(Z[1:I1+1,1:J1+1]))
+        moyenne=np.mean(np.array(Z[0:I1+1,0:J1+1]))
         dénominateur=0
         RMSE=0
         MAE=0
@@ -472,13 +472,13 @@ def HASM(nom_fichier,forma, lambd=1000):
         R=1-(numérateur/dénominateur)
         RMSE=math.sqrt(RMSE/(I1*J1))  
         MAE=(MAE/(I1*J1))
-        print("RMSE=  ", RMSE," MAE=  ", MAE)    
+        # print("RMSE=  ", RMSE," MAE=  ", MAE)    
         
         RMSE_rela=0
         for i in range(nombre):
                 RMSE_rela=RMSE_rela+(Z[x1[i]+1, y1[i]+1]-Solu[x1[i],y1[i]])**2
         RMSE_rela=math.sqrt(RMSE_rela/(nombre))
-        print("RMSE relative au points échantillonné      RMSE=  ", RMSE_rela ,"    R=  ",R)
+        # print("RMSE relative au points échantillonné      RMSE=  ", RMSE_rela ,"    R=  ",R)
         
         
         x = np.linspace(x_range[0], x_range[1], I)
@@ -498,21 +498,21 @@ def HASM(nom_fichier,forma, lambd=1000):
 
         
         # Affichage en 2D avec un nuage de points
-        fig=plt.figure(figsize=(8, 6))
-        #plt.scatter(X, Y, c=Solu, cmap='viridis')
-        #plt.colorbar(label='Valeur de la fonction')
-        #contours = plt.contour(X, Y, Solu, cmap='viridis')
-        #plt.colorbar(contours, label='Valeur de la fonction')
-        ax = fig.add_subplot(111, projection='3d')
-        ax.plot_surface(X, Y, Solu, cmap='viridis')
-        ax.set_title('Représentation 3D de la fonction')
-        plt.title('Surface plot of f(x, y) =')
-        #Représentation 2D de la fonction avec un nuage de points
-        ax.set_zlim(np.min(Z), np.max(Z))
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.grid(True)
-        plt.show()
+        # fig=plt.figure(figsize=(8, 6))
+        # plt.scatter(X, Y, c=Solu, cmap='viridis')
+        # plt.colorbar(label='Valeur de la fonction')
+        # contours = plt.contour(X, Y, Solu, cmap='viridis')
+        # plt.colorbar(contours, label='Valeur de la fonction')
+        # ax = fig.add_subplot(111, projection='3d')
+        # ax.plot_surface(X, Y, Solu, cmap='viridis')
+        # ax.set_title('Représentation 3D de la fonction')
+        # plt.title('Surface plot of f(x, y) =')
+        # Représentation 2D de la fonction avec un nuage de points
+        # ax.set_zlim(np.min(Z), np.max(Z))
+        # plt.xlabel('X')
+        # plt.ylabel('Y')
+        # plt.grid(True)
+        # plt.show()
         
         # Insérer la matrice à partir de la position spécifiée
         
@@ -530,15 +530,18 @@ def HASM(nom_fichier,forma, lambd=1000):
             Solu = np.reshape(Solu, ( I1*J1 , 1 )) # redimensionnement de la taille
             donnee_initiale = np.reshape(donnee_initiale, ( I1*J1 , 1 )) # redimensionnement de la taille
             
-            return (X,Y,Solu,donnee_initiale,colonne0,colonne1)
+            return (X,Y,Solu,donnee_initiale,colonne0,colonne1,RMSE,MAE,RMSE_rela,R)
         else:
             return "Attention : Le cinquième paramètre qui est le format ne prend que deux valeurs \n Le format 1 renvoie le résultat de la prédiction sous forme de matrice \n le format 2 renvoie le résultat de la prédiction sous forme de vecteur"
 
 
-nom_fichier="moderate_Sph_negative_data_64_.xlsx"
-fichier_fonction='fonction.xlsx'
-x_range = (5, 5.49)
-y_range = (0, 0.59)
+
+
+
+
+nom_fichier="../Simulation1/moderate_Sph_negative_data_80_.xlsx"
+pourcentage=90   # pourcentage de donnée pour l'entrainement du modèle
+
 forma=2
 # Le résultat de la prédiction de la méthode HASM renvoie sous le format indiqué dans l'ordre :
 # 1- les valeurs des abscisses dicrétisés 
@@ -547,34 +550,54 @@ forma=2
 #    dicrétisées ci-dessus
 # 4- les valeurs des données exactes fournies de l'attibuts à l'intérieur du 
 #    du domaine et non au bord du domaine
-sortie_prediction= HASM(nom_fichier,forma,1000)
-X,Y,Solu,donnee_initiale,c1,c2=sortie_prediction
-# Convertir la matrice en DataFrame
 
-if (forma==1):
-    mon_fichier1= pd.DataFrame(X)
-    mon_fichier2= pd.DataFrame(Y)
-    mon_fichier3= pd.DataFrame(Solu)
-    mon_fichier4= pd.DataFrame(donnee_initiale)
-    #Enregistrer la DataFrame dans un fichier Excel
-    mon_fichier1.to_excel("../Sortie_prediction_format1/X1.xlsx", index=False, header=False)
-    mon_fichier2.to_excel("../Sortie_prediction_format1/Y1.xlsx", index=False, header=False)
-    mon_fichier3.to_excel("../Sortie_prediction_format1/prédiction1.xlsx", index=False, header=False)
-    mon_fichier4.to_excel("../Sortie_prediction_format1/Z_donnée1.xlsx", index=False, header=False)
+
+
+
+vecteur= []
+combined_matrix = np.empty((48,0))
+
+for i in range(2,10):
     
+    sortie_prediction= HASM(nom_fichier,forma,pourcentage,i,1000)
+    X,Y,Solu,donnee_initiale,c1,c2,RMSE,MAE,RMSE_rela,R=sortie_prediction
     
- 
+    if (forma==1):
+        mon_fichier1= pd.DataFrame(X)
+        mon_fichier2= pd.DataFrame(Y)
+        mon_fichier3= pd.DataFrame(Solu)
+        mon_fichier4= pd.DataFrame(donnee_initiale)
+        #Enregistrer la DataFrame dans un fichier Excel
+        mon_fichier1.to_excel("../Sortie_prediction_format1/X1.xlsx", index=False, header=False)
+        mon_fichier2.to_excel("../Sortie_prediction_format1/Y1.xlsx", index=False, header=False)
+        mon_fichier3.to_excel("../Sortie_prediction_format1/prédiction1.xlsx", index=False, header=False)
+        mon_fichier4.to_excel("../Sortie_prediction_format1/Z_donnée1.xlsx", index=False, header=False)
+        
+    
+    if (forma==2):
+        
+        n=np.size(X)
+        
+        RMSE,MAE,RMSE_rela,R = np.ones((n,1))*RMSE,np.ones((n,1))*MAE,np.ones((n,1))*RMSE_rela,np.ones((n,1))*R
+        # Convertir la matrice en DataFrame
+        # Combiner les matrices en une seule matrice à plusieurs colonnes
+        
+        matrix = np.column_stack((X, Y, Solu, donnee_initiale,RMSE,MAE,RMSE_rela,R))
+        combined_matrix = np.hstack((combined_matrix, matrix)) 
+        
+        
+        
+        col=['X'+str(i), 'Y'+str(i), 'prediction'+str(i),'Z_donnee'+str(i),'RMSE'+str(i),'MAE'+str(i),'RMSE_rela'+str(i),'R'+str(i)]
+        vecteur = np.hstack((vecteur, col))
+        
+             
+
+        
 if (forma==2):
     
-    # Combiner les matrices en une seule matrice à plusieurs colonnes
-    combined_matrix = np.column_stack((X, Y, Solu, donnee_initiale))
-    
-    # Transformer la matrice en DataFrame pandas
-    mon_fichier= pd.DataFrame(combined_matrix, columns=['X1', 'Y1', 'prediction1','Z_donnee1'])
-    
+    mon_fichier= pd.DataFrame(combined_matrix, columns=vecteur)
     # Spécifier le chemin complet où le fichier Excel sera enregistré
     chemin_fichier = '../Sortie_prediction_format2/Sortie_format1_prediction1.xlsx'
     
     # Enregistrer le DataFrame dans un fichier Excel
     mon_fichier.to_excel(chemin_fichier, index=False)
-
