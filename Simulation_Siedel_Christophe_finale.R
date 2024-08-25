@@ -88,9 +88,19 @@ Coordonnée <- function(x_int, y_int)
   nrow(Coord)
   df <- CoordCRD[CoordCRD$x != filter_col1[1] & CoordCRD$x != filter_col1[2] & CoordCRD$y != filter_col2[1] & CoordCRD$y != filter_col2[2],]
   
+  ShpPtsDat <- CoordCRD[,c(1:2)]
+  colnames(ShpPtsDat) <- c("x","y")
+  
+  data_sf <- st_as_sf(ShpPtsDat, coords = c("x", "y")) %>%
+    st_set_crs(32631)
+  MD <- drop_units(max(st_distance(data_sf)))
+  
+  
   return(list(
     df1 = Coord ,
-    df2 = df
+    df2 = df,
+    df3 = CoordCRD ,
+    df3 = MD
   ))
 }
 
@@ -131,7 +141,9 @@ yy <- predict(g.dummy, newdata=ShpPtsDat, nsim=number);cat("\014")
       
       return(list(
         df1 = AtSimSK ,
-        df2 = SDISph
+        df2 = SDISph ,
+        df3 = MD ,
+        df4 = range 
       ))
       
 }
@@ -162,6 +174,8 @@ intern_donne <- function(CoordCRD,psill,nugget,model1,spa.d,Rexp,R)
       sortie=intermediare(CoordCRD,psill,nugget,model1,spa.d,Rexp,ratio,skwenes)
       Attribut=sortie[[1]] 
       SDISph12=sortie[[2]]
+      MD=sortie[[3]]
+      range=sortie[[4]]
       row=nrow(CoordCRD)
       data_Site <- Attribut
       
@@ -186,7 +200,9 @@ intern_donne <- function(CoordCRD,psill,nugget,model1,spa.d,Rexp,R)
     
     return(list(
       df1 = donnee ,
-      df2 = SDISph12
+      df2 = SDISph12 ,
+      df3 = MD ,
+      df4 = range 
     ))
 
 }
@@ -211,21 +227,25 @@ general=function(bordcoord,CoordCRD,psill,nugget,model1,spa.d,ratio,skwenes,Rexp
   {
     
     
-    bord=intermediare(bordcoord,psill,nugget,model1,spa.d,10,ratio,skwenes)
+    bord=intermediare(bordcoord,psill,nugget,model1,spa.d,1000,ratio,skwenes)
     dbord=bord[[1]]
     SDISph11=bord[[2]]
+    MD1=bord[[3]]
+    range1=bord[[4]]
     
     
     interieur=intern_donne(CoordCRD,psill,nugget,model1,spa.d,Rexp,R)
     donnefin_inter=interieur[[1]]
     SDISph12=interieur[[2]]
+    MD2=interieur[[3]]
+    range2=interieur[[4]]
     
     # Séléctionner une condition au bord
     choix=1
     donnefinbord=donneebord(bordcoord, dbord , choix)
     
-    names(donnefinbord) <- paste0("col", 3:(Rexp+2))
-    names(donnefin_inter) <- paste0("col", 3:(Rexp+2))
+    names(donnefinbord)[3:(Rexp+2)] <- paste0("col", 3:(Rexp+2))
+    names(donnefin_inter)[3:(Rexp+2)] <- paste0("col", 3:(Rexp+2))
     donnee_finale=rbind(donnefinbord,donnefin_inter)
     
     write_xlsx(donnee_finale,paste(spa.d,model1,ske,"data",n,".xlsx",sep = "_"))
@@ -233,7 +253,11 @@ general=function(bordcoord,CoordCRD,psill,nugget,model1,spa.d,ratio,skwenes,Rexp
     return(list(
       df1 =donnee_finale  ,
       df2 = SDISph11 ,
-      df3 = SDISph12
+      df3 = SDISph12 ,
+      df4 = MD1 ,
+      df5 = range1 ,
+      df6 = MD2 ,
+      df7 = range2 
     ))
     
   }
@@ -247,12 +271,14 @@ Rexp = 1000
 nbAtt=100  
 
 
-x_int= c(1,10,6) 
-y_int= c(1,10,5)
+x_int= c(1,10,8) 
+y_int= c(1,10,8)
 result <- Coordonnée(x_int,y_int)
 
 bordcoord=result[[1]]
 CoordCRD=result[[2]]
+toutes_coord=result[[3]]
+Distance_Max=result[[4]]
 n = nrow(CoordCRD)+nrow(bordcoord)
 
 
@@ -263,8 +289,12 @@ nugget13=0.1;sill13=0.9 # Strong
 ## Spatial variogram structure
 model1="Sph"
 
-skwenes=0
-ske="symetric"
+asymetrie=c("negative","symetric","positive")
+degré_asymetrie=c(-1,0,1)
+
+ske=asymetrie[2]
+skwenes=degré_asymetrie[2]
+
 
 
 cat("\014") 
@@ -281,12 +311,10 @@ pb <- tkProgressBar(title = " WEAK SPHERIQUE SYMETRIC DATA SIMULATION",      # W
 ## Variogram parameters
 spa.d <- "Weak"   ## Spatial dependence
 ratio=8
+range_weak=Distance_Max/ratio
 
 resulta_final_1=general(bordcoord,CoordCRD,sill11,nugget11,model1,spa.d,ratio,skwenes,Rexp,R)
 
-
-
-cat("\014") 
 
 
 ########################## SPHERIQUE SIMULATION ###########################################
@@ -297,11 +325,13 @@ pb <- tkProgressBar(title = " MODERATE SPHERIQUE SYMETRIC DATA SIMULATION",     
                     initial = 0,  # Initial value of the bar
                     width = 500)  # Width of the window
 
-## Variogram parameters
+## Vadiogram parameters
 spa.d <- "moderate"   ## Spatial dependence
 ratio=4
+range_moderate=Distance_Max/ratio
 
 resulta_final_2=general(bordcoord,CoordCRD,sill12,nugget12,model1,spa.d,ratio,skwenes,Rexp,R)
+
 
 
 cat("\014") 
@@ -319,6 +349,7 @@ pb <- tkProgressBar(title = " STRONG SPHERIQUE SYMETRIC DATA SIMULATION",      #
 ## Variogram parameters
 spa.d <- "strong"   ## Spatial dependence
 ratio=2
+range_strong=Distance_Max/ratio
 
 resulta_final_3=general(bordcoord,CoordCRD,sill13,nugget13,model1,spa.d,ratio,skwenes,Rexp,R)
 
