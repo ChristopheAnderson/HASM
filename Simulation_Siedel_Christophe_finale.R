@@ -248,7 +248,7 @@ general=function(bordcoord,CoordCRD,psill,nugget,model1,spa.d,ratio,skwenes,Rexp
     names(donnefin_inter)[3:(Rexp+2)] <- paste0("col", 3:(Rexp+2))
     donnee_finale=rbind(donnefinbord,donnefin_inter)
     
-    write_xlsx(donnee_finale,paste(spa.d,model1,ske,"data",n,".xlsx",sep = "_"))
+    write_xlsx(donnee_finale,paste("C:/Users/Christophe/Documents/",spa.d,model1,ske,"data",n,".xlsx",sep = "_"))
     
     return(list(
       df1 =donnee_finale  ,
