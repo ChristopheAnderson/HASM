@@ -566,11 +566,11 @@ def HASM(nom_fichier , forma , pourcentage , position_attribut , lambd=1000):
             return "Attention : Le cinquième paramètre qui est le format ne prend que deux valeurs \n Le format 1 renvoie le résultat de la prédiction sous forme de matrice \n le format 2 renvoie le résultat de la prédiction sous forme de vecteur"
 
 
+les_fichiers=["Weak_Sph_negative_data_64_.xlsx" ,"Weak_Sph_symetric_data_64_.xlsx" ,"Weak_Sph_positive_data_64_.xlsx" ,"moderate_Sph_negative_data_64_.xlsx" ,"moderate_Sph_symetric_data_64_.xlsx" ,"moderate_Sph_positive_data_64_.xlsx" ,"strong_Sph_negative_data_64_.xlsx" ,"strong_Sph_symetric_data_64_.xlsx" ,"strong_Sph_positive_data_64_.xlsx" , "Weak_Sph_negative_data_80_.xlsx" ,"Weak_Sph_symetric_data_80_.xlsx" ,"Weak_Sph_positive_data_80_.xlsx" ,"moderate_Sph_negative_data_80_.xlsx" ,"moderate_Sph_symetric_data_80_.xlsx" ,"moderate_Sph_positive_data_80_.xlsx" ,"strong_Sph_negative_data_80_.xlsx" ,"strong_Sph_symetric_data_80_.xlsx" ,"strong_Sph_positive_data_80_.xlsx" , "Weak_Sph_negative_data_169_.xlsx" ,"Weak_Sph_symetric_data_169_.xlsx" ,"Weak_Sph_positive_data_169_.xlsx" ,"moderate_Sph_negative_data_169_.xlsx" ,"moderate_Sph_symetric_data_169_.xlsx" ,"moderate_Sph_positive_data_169_.xlsx" ,"strong_Sph_negative_data_169_.xlsx" ,"strong_Sph_symetric_data_169_.xlsx" ,"strong_Sph_positive_data_169_.xlsx" , "Weak_Sph_negative_data_250_.xlsx" ,"Weak_Sph_symetric_data_250_.xlsx" ,"Weak_Sph_positive_data_250_.xlsx" ,"moderate_Sph_negative_data_250_.xlsx" ,"moderate_Sph_symetric_data_250_.xlsx" ,"moderate_Sph_positive_data_250_.xlsx" ,"strong_Sph_negative_data_250_.xlsx" ,"strong_Sph_symetric_data_250_.xlsx" ,"strong_Sph_positive_data_250_.xlsx" , "Weak_Sph_negative_data_400_.xlsx" ,"Weak_Sph_symetric_data_400_.xlsx" ,"Weak_Sph_positive_data_400_.xlsx" ,"moderate_Sph_negative_data_400_.xlsx" ,"moderate_Sph_symetric_data_400_.xlsx" ,"moderate_Sph_positive_data_400_.xlsx" ,"strong_Sph_negative_data_400_.xlsx" ,"strong_Sph_symetric_data_400_.xlsx" ,"strong_Sph_positive_data_400_.xlsx" , ]
 
 
 
-
-nom_fichier="../Simulation1/moderate_Sph_negative_data_64_.xlsx"
+nom_fichier='../Simulation1/' + les_fichiers[0]
 pourcentage=70   # pourcentage de donnée pour l'entrainement du modèle
 forma=3
 # Le résultat de la prédiction de la méthode HASM renvoie sous le format indiqué dans l'ordre :
@@ -673,8 +673,24 @@ if (forma==3):
     
     # mon_fichier= pd.DataFrame(combined_matrix, columns=vecteur)
     mon_fichier= pd.DataFrame(combined, columns=coll1)
+    
+    mots1 = ["weak", "moderate", "strong", "negative", "symetric", "positive" ]
+    mots2 = ["64","80","169","250","400"]
+    
+    mot_trouve = ""
+    
+    for mot in mots1:
+      if mot in nom_fichier:
+        mot_trouve = mot_trouve + mot[0].upper()
+    
+    for mot in mots2:
+      if mot in nom_fichier:
+        mot_trouve = mot_trouve + '_' + mot
+         
+    mot_trouve=  mot_trouve + '.xlsx' 
+    
     # Spécifier le chemin complet où le fichier Excel sera enregistré
-    chemin_fichier = '../Sortie_prediction_format2/Sortie_format1_prediction1.xlsx'
+    chemin_fichier = '../Output_HASM/HASM_' + mot_trouve
     
     # Enregistrer le DataFrame dans un fichier Excel
     mon_fichier.to_excel(chemin_fichier, index=False)
