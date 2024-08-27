@@ -134,8 +134,9 @@ yy <- predict(g.dummy, newdata=ShpPtsDat, nsim=number);cat("\014")
       skew.yy=round(skew.yy,0);#kurt.yy=round(kurt.yy,0)
       
       #nSimSK=which(skew.yy == 0 & kurt.yy == 0)   ;nSimSK     ## Find
-      nSimSK=which(round(skew.yy,0) == skwenes & abs(round(skew.yy,1))> abs(skwenes)-0.1 & abs(round(skew.yy,1))< abs(skwenes)+0.1 )
-      
+      #nSimSK=which(round(skew.yy,0) == skwenes & abs(round(skew.yy,1))> abs(skwenes)-0.1 & abs(round(skew.yy,1))< abs(skwenes)+0.1 )
+      nSimSK=which(  abs(skew.yy - skwenes ) < 0.1 )
+      nSimSK
       #length(nSimSK)
       AtSimSK= Zyy[nSimSK]
       
@@ -271,8 +272,8 @@ Rexp = 1000
 nbAtt=100  
 
 
-x_int= c(1,10,8) 
-y_int= c(1,10,8)
+x_int= c(1,10,20) 
+y_int= c(1,10,20)
 result <- Coordonnée(x_int,y_int)
 
 bordcoord=result[[1]]
@@ -292,8 +293,9 @@ model1="Sph"
 asymetrie=c("negative","symetric","positive")
 degré_asymetrie=c(-1,0,1)
 
-ske=asymetrie[2]
-skwenes=degré_asymetrie[2]
+numero=1
+ske=asymetrie[numero]
+skwenes=degré_asymetrie[numero]
 
 
 
@@ -309,7 +311,7 @@ pb <- tkProgressBar(title = " WEAK SPHERIQUE SYMETRIC DATA SIMULATION",      # W
                     width = 500)  # Width of the window
 
 ## Variogram parameters
-spa.d <- "Weak"   ## Spatial dependence
+spa.d <- "weak"   ## Spatial dependence
 ratio=8
 range_weak=Distance_Max/ratio
 
