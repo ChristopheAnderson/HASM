@@ -1,0 +1,225 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[
+11pt, % The default document font size, options: 10pt, 11pt, 12pt
+oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
+french, %english, % ngerman for German
+onehalfspacing % singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+%draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+%nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
+%liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
+toctotoc, % Uncomment to add the main table of contents to the table of contents
+%parskip, % Uncomment to add space between paragraphs
+%nohyperref, % Uncomment to not load the hyperref package
+headsepline, % Uncomment to get a line under the header
+%chapterinoneline, % Uncomment to place the chapter title next to the number on one line
+%consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
+]{MastersDoctoralThesis} % The class file specifying the document structure
+
+%Options : inlinechap, quotchpI, boxedchapnum, boxedchapnumN, quotchapII, roundchapnum, boxedchapnumL, boxedchapnumR
+
+
+
+
+
+
+\usepackage[boxedchapnum]{settings/fncystyle}
+\usepackage[sloped]{fourier}
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+\usepackage{verbatim}
+%\usepackage{mathpazo} % Use the Palatino font by default
+\usepackage{dirtytalk}
+%\usepackage[backend=bimer,sorting=nyt,format=plain]{biblatex}
+\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex
+% backend with the authoryear citation style (which resembles APA)
+\addbibresource{reference}
+
+\usepackage{pgfplots}
+\usepackage{centernot}
+\usepackage{biblatex}
+\usepackage{amsmath}
+\usepackage{nccmath}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{nccmath}
+\usepackage{graphicx}
+\usepackage{shorttoc}
+\usepackage{graphics}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{changepage}
+\usepackage{geometry}
+\renewcommand{\dedicationname}{DEDICACE}
+\usepackage{textcase}
+%\usepackage{tocloft}
+%\usepackage{titletoc}
+\graphicspath{ {./images/} }
+\addbibresource{thesiscedric} % The filename of the bibliography
+\usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+
+\setcounter{tocdepth}{1}
+%---------------------------------------------------------------------------------------
+%	MARGIN SETTINGS
+%----------------------------------------------------------------------------------------
+
+\geometry{
+	paper=a4paper, % Change to letterpaper for US letter
+	inner=2.5cm, % Inner margin
+	outer=3.8cm, % Outer margin
+	bindingoffset=.5cm, % Binding offset
+	top=1.5cm, % Top margin
+	bottom=1.5cm, % Bottom margin
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+
+%----------------------------------------------------------------------------------------
+%	THESIS INFORMATION
+%----------------------------------------------------------------------------------------
+
+
+\thesistitle{\textcolor{blue}{Comparaison des méthodes BME (Bayesian Maximum Entropy) et HASM(High Accuracy Surface Modeling) pour la modélisation en géostatistique}} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
+\supervisor{Prof  Eric \textsc{ALAMOU}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
+\examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
+\degree{Ingénieur de conception} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
+\author{Christophe \textsc{WAVOEKE}} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
+\addresses{} % Your address, this is not currently used anywhere in the template, print it elsewhere with \addressname
+
+\subject{Sciences de l'ingénieur} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \subjectname
+\keywords{} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
+\university{\href{http://https://unstim.bj}{Ecole Nationale Supérieure de Génie Mathématique et Modélisation}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
+\department{\href{http://department.university.com}{Department or School Name}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
+\group{\href{http://researchgroup.university.com}{Research Group Name}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
+\faculty{\href{http://faculty.university.com}{Faculty Name}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
+
+\AtBeginDocument{
+\hypersetup{colorlinks=true,linkcolor=blue}
+\hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
+\hypersetup{pdfauthor=\authorname} % Set the PDF's author to your name
+\hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
+}
+
+
+%================ADDED===============
+%\usepackage{setspace}
+% Pour les paragraphes
+\parindent = 0pt
+\parskip = 7pt
+%\setstretch{1.1}
+%\onehalfspacing
+%\setcounter{tocdepth}{0}
+
+%Add this command where you want to print the Toc, Lof and Lot
+
+\newcommand{\minitoclt}{
+	\setcounter{tocdepth}{4}
+	\begingroup
+	\newcommand{\mytocrule}{\hrule}
+	\etocsettocstyle{{\bf\large Contenu}
+		\medskip%
+		\mytocrule%
+	}{%
+		\smallskip%
+		\mytocrule%
+	}
+	\localtableofcontents % \minitoc
+	\minilof
+	\minilot
+	\endgroup
+%\newcommand{\minitoclt}{
+%	\begingroup
+%		\newcommand{\mytocrule}{\hrule}
+%		\etocsettocstyle{{\bf\large Contenu}
+%			\medskip%
+%			\mytocrule%
+%		}{%
+%			\smallskip%
+%			\mytocrule%
+%		}
+%		\localtableofcontents % \minitoc
+%		\minilof
+%		\minilot
+%	\endgroup
+}
+%=======================================
+
+%\renewcommand{\bibliographyname}{Réf bibliographiques}
+
+\begin{document}
+
+\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
+
+\pagestyle{plain} % Default to the plain heading style until the thesis style is called for the body content
+
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+\include{Begining/coverpage}
+
+%----------------------------------------------------------------------------------------
+\include{Begining/Declaration}
+%--------------------------------------------------------------------------------------
+\include{Begining/Approbation}
+%--------------------------------------------------------------------------------------
+\include{Begining/dedicaces}
+%----------------------------------------------------------------------------------------
+\include{Begining/remerciements}
+%----------------------------------------------------------------------------------------
+\include{Begining/abbreviation}
+
+
+        \listoftables
+	\listoffigures
+	
+%----------------------------------------------------------------------------------------
+%	RESUME PAGE
+%----------------------------------------------------------------------------------------
+\include{Begining/resume}
+%----------------------------------------------------------------------------------------
+%	ABSTRACT PAGE
+%----------------------------------------------------------------------------------------
+\include{Begining/abstract}
+
+
+\include{Begining/tables}
+
+
+\mainmatter % Begin numeric (1,2,3...) page numbering
+
+\pagestyle{thesis} % Return the page headers back to the "thesis" style
+
+% Include the chapters of the thesis as separate files from the Chapters folder
+% Uncomment the lines as you write the chapters
+%\startcontents
+%\printcontents{}{0}{}
+	
+%\include{Chapters/Chapter1}
+
+%\include{Chapters/Chapter2}  
+
+\include{Chapters/Chapter3}
+
+\include{Chapters/Chapter4}
+
+\include{Chapters/Conclusion}
+	
+\include{Chapters/Perspectives}
+	
+\printbibliography		
+
+\include{Chapters/Annexes}
+
+
+
+\end{document}
