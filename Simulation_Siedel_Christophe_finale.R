@@ -272,8 +272,8 @@ Rexp = 1000
 nbAtt=100  
 
 
-x_int= c(1,10,20) 
-y_int= c(1,10,20)
+x_int= c(1,10,8) 
+y_int= c(1,10,8)
 result <- Coordonnée(x_int,y_int)
 
 bordcoord=result[[1]]
@@ -293,7 +293,7 @@ model1="Sph"
 asymetrie=c("negative","symetric","positive")
 degré_asymetrie=c(-1,0,1)
 
-numero=1
+numero=2
 ske=asymetrie[numero]
 skwenes=degré_asymetrie[numero]
 
